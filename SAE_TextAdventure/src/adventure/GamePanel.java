@@ -134,9 +134,9 @@ public class GamePanel extends JPanel{
 	}
 	
 	public void continueGame() {
-		if (!isGameOver()) {
-			timer.start();
-		}
+//		if (!isGameOver()) {
+//			timer.start();
+//		}
 	}
 	public void restartGame() {
 		counter = 0;

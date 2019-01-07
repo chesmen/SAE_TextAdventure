@@ -32,26 +32,28 @@ public class GameWindow extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		getContentPane().setLayout(new GridLayout(1, 0, 0, 0));
 		
-		registerWindowListener();
 		createMenu();
 		
 	    setTitle("Text Adventure");
 	    setLocation(10, 10);
 	    setResizable(true);
 	    
+	    mainPanel = new GamePanel();
+	    registerWindowListener();
+	    
 	    pack();
 	    setVisible(true);
 		
-		boolean startEntscheidung = true;
-		while(startEntscheidung) {
-			JPanel preGamePanel = new JPanel();
-			preGamePanel.setBackground(Color.DARK_GRAY);
-			JLabel text = new JLabel("Wähle die Schwierigkeit!");
-			text.setLocation(this.getWidth()/2-text.getWidth()/2, this.getHeight()/5);
-			preGamePanel.add(text);
-			}
+//		boolean startEntscheidung = true;
+//		while(startEntscheidung) {
+//			JPanel preGamePanel = new JPanel();
+//			preGamePanel.setBackground(Color.DARK_GRAY);
+//			JLabel text = new JLabel("Wähle die Schwierigkeit!");
+//			text.setLocation(this.getWidth()/2-text.getWidth()/2, this.getHeight()/5);
+//			preGamePanel.add(text);
+//			}
 		
-		mainPanel = new GamePanel();
+		
 		mainPanel.setBackground(Color.BLACK);
 		getContentPane().add(mainPanel);
 			
