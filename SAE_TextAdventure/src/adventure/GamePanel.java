@@ -49,12 +49,14 @@ public class GamePanel extends JPanel{
 	boolean warten;
 	String entscheidung;
 	
+	Player player;
+	
 	private JButton leftButton = new JButton("");
 	private JButton middleButton = new JButton("");	
 	private JButton rightButton = new JButton("");
 	
-	JLabel label1 = new JLabel("");
-	JLabel label2 = new JLabel("");
+	JLabel label_choice1 = new JLabel("");
+	JLabel label_choice2 = new JLabel("");
 	
 	public GamePanel() {        
         setFocusable(true);
@@ -111,18 +113,18 @@ public class GamePanel extends JPanel{
 		gbc_ChoicesPanel.gridy = 12;
 		add(choicesPanel, gbc_ChoicesPanel);
         
-		label1.setHorizontalAlignment(SwingConstants.CENTER);
-		label1.setVerticalAlignment(SwingConstants.CENTER);
+		label_choice1.setHorizontalAlignment(SwingConstants.CENTER);
+		label_choice1.setVerticalAlignment(SwingConstants.CENTER);
 		
-		label2.setHorizontalAlignment(SwingConstants.CENTER);
-		label2.setVerticalAlignment(SwingConstants.CENTER);
+		label_choice2.setHorizontalAlignment(SwingConstants.CENTER);
+		label_choice2.setVerticalAlignment(SwingConstants.CENTER);
 		
 		GroupLayout gl_choicesPanel = new GroupLayout(choicesPanel);
 		gl_choicesPanel.setHorizontalGroup(
 			gl_choicesPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_choicesPanel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(label1, GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+					.addComponent(label_choice1, GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
 					.addContainerGap())
 				.addGroup(gl_choicesPanel.createSequentialGroup()
 					.addGap(178)
@@ -134,15 +136,15 @@ public class GamePanel extends JPanel{
 					.addGap(218))
 				.addGroup(Alignment.TRAILING, gl_choicesPanel.createSequentialGroup()
 					.addContainerGap()
-					.addComponent(label2, GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+					.addComponent(label_choice2, GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
 					.addContainerGap())
 		);
 		gl_choicesPanel.setVerticalGroup(
 			gl_choicesPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_choicesPanel.createSequentialGroup()
-					.addComponent(label1)
+					.addComponent(label_choice1)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(label2)
+					.addComponent(label_choice2)
 					.addPreferredGap(ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
 					.addGroup(gl_choicesPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(leftButton)
@@ -154,8 +156,13 @@ public class GamePanel extends JPanel{
 		
 		
 		
-		label1.setVisible(false);
-		label2.setVisible(false);
+		label_choice1.setVisible(false);
+		label_choice2.setVisible(false);
+		
+		leftButton.setActionCommand("left");
+		middleButton.setActionCommand("middle");
+		rightButton.setActionCommand("right");		
+		
 		leftButton.setVisible(false);
 		middleButton.setVisible(false);
 		rightButton.setVisible(false);
@@ -174,6 +181,11 @@ public class GamePanel extends JPanel{
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
 	}
+	public void checkGameOver() {
+		if(player.life<1) {
+			gameOver = true;
+		}
+	}
 
 	private void initGame () {
 		timer = new Timer(20, new ActionListener() {
@@ -182,9 +194,11 @@ public class GamePanel extends JPanel{
                 doOnTick();     
             }
         });
+		player = new Player();
+		createGameStart();
 	}
-	private void createGameObjects() {
-		// TODO Mal schauen ob das hier benötigt wird
+	private void createGameStart() {
+		// TODO erstelle StartLayout für Panels
 		
 	}
 	private void doOnTick() {
@@ -207,7 +221,7 @@ public class GamePanel extends JPanel{
 	public void restartGame() {
 		counter = 0;
 		setGameOver(false);
-		createGameObjects();
+		createGameStart();
 		startGame();
 	}
 	
@@ -216,18 +230,18 @@ public class GamePanel extends JPanel{
 		warten = true;
 		
 		choicesPanel.setBackground(Color.DARK_GRAY);
-		label1.setForeground(Color.WHITE);
-		label2.setForeground(Color.WHITE);
+		label_choice1.setForeground(Color.WHITE);
+		label_choice2.setForeground(Color.WHITE);
 		
-		label1.setText("Wähle die Schwierigkeit");
-		label2.setText("Einfach: 5 Leben - Mittel: 3 Leben - Schwer: 1 Leben");
+		label_choice1.setText("Wähle die Schwierigkeit!");
+		label_choice2.setText("Einfach: 5 Leben - Mittel: 3 Leben - Schwer: 1 Leben");
 		
 		leftButton.setText("Einfach");
 		middleButton.setText("Mittel");
 		rightButton.setText("Schwer");
 		
-		label1.setVisible(true);
-		label2.setVisible(true);
+		label_choice1.setVisible(true);
+		label_choice2.setVisible(true);
 		leftButton.setVisible(true);
 		middleButton.setVisible(true);
 		rightButton.setVisible(true);
@@ -236,10 +250,15 @@ public class GamePanel extends JPanel{
 		while(warten) {
 		}
 		switch(entscheidung) {
-		case "Einfach":
-			
-		case "Mittel":
-		case "Schwer":
+		case "left":
+			player.setLife(5);
+			break;
+		case "middle":
+			player.setLife(3);
+			break;
+		case "right":
+			player.setLife(1);
+			break;
 		}
 		
 	}
@@ -248,21 +267,21 @@ public class GamePanel extends JPanel{
         leftButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				entscheidung = leftButton.getText();
+				entscheidung = leftButton.getActionCommand();
 				warten = false;
 			}
 		});
 		middleButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent mb) {
-				entscheidung = middleButton.getText();
+				entscheidung = middleButton.getActionCommand();
 				warten = false;
 			}
 		});
 		rightButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent rb) {
-				entscheidung = rightButton.getText();
+				entscheidung = rightButton.getActionCommand();
 				warten = false;
 			}
 		});

@@ -24,7 +24,7 @@ import java.awt.event.WindowEvent;
 
 public class GameWindow extends JFrame {
 
-	private final GamePanel mainPanel;
+	public final GamePanel mainPanel;
 	
 	
 	public GameWindow(){
