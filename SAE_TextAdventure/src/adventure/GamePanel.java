@@ -15,6 +15,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
 import static java.awt.event.KeyEvent.*;
 import java.net.URL;
@@ -22,6 +23,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
@@ -38,8 +40,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 public class GamePanel extends JPanel{
 
 	private final JPanel textPanel;
-	private final JPanel leftBGPanel;
-	private final JPanel rightBGPanel;
+	private final BackgroundPanel leftBGPanel;
+	private final BackgroundPanel rightBGPanel;
 	private final JPanel choicesPanel;
 	
 	private Timer timer;
@@ -48,6 +50,19 @@ public class GamePanel extends JPanel{
 	private Color bgColor;
 	boolean warten;
 	String entscheidung;
+	
+
+	// = new ImageIcon(getClass().getResource(IMAGE_DIR + backgroundImages[0]));
+	
+	
+	public static final String IMAGE_DIR = "images/";
+	private final String[] backgroundImages= new String [] {"waldrand.jpg" // 0
+														   ,"seetal.jpg","wurzelzwerge.jpg" // 1 , 2
+														   ,"fluss.jpg","wald.jpg","windheim.jpg" // 3 , 4 , 5
+														   ,"steinheim.jpg","felstal.jpg" // 6 , 7
+														   ,"spitzberg.jpg"}; // 8
+	private ImageIcon backgroundImage = new ImageIcon(getClass().getResource(IMAGE_DIR + backgroundImages[0]));
+	
 	
 	Player player;
 	
@@ -61,6 +76,7 @@ public class GamePanel extends JPanel{
 	public GamePanel() {        
         setFocusable(true);
         setBackground(Color.GREEN);
+                
         GridBagLayout gbl_MainPanel = new GridBagLayout();
 										
 		gbl_MainPanel.columnWidths = new int[]{40, 40, 40, 40, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 40, 40, 40, 40, 0};
@@ -69,18 +85,17 @@ public class GamePanel extends JPanel{
 		gbl_MainPanel.rowWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gbl_MainPanel);
         
-        leftBGPanel = new JPanel();
+        leftBGPanel = new BackgroundPanel(backgroundImage.getImage());
 		leftBGPanel.setBackground(Color.ORANGE);
 		GridBagConstraints gbc_LeftBGPanel = new GridBagConstraints();
 		gbc_LeftBGPanel.gridwidth = 4;
 		gbc_LeftBGPanel.gridheight = 17;
-		gbc_LeftBGPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_LeftBGPanel.fill = GridBagConstraints.BOTH;
 		gbc_LeftBGPanel.gridx = 0;
 		gbc_LeftBGPanel.gridy = 0;
 		add(leftBGPanel, gbc_LeftBGPanel);
 		
-		rightBGPanel = new JPanel();
+		rightBGPanel = new BackgroundPanel(backgroundImage.getImage());
 		rightBGPanel.setBackground(Color.ORANGE);
 		GridBagConstraints gbc_RightBGPanel = new GridBagConstraints();
 		gbc_RightBGPanel.gridheight = 17;
@@ -95,7 +110,6 @@ public class GamePanel extends JPanel{
 		GridBagConstraints gbc_textPanel = new GridBagConstraints();
 		gbc_textPanel.gridwidth = 21;
 		gbc_textPanel.gridheight = 12;
-		gbc_textPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_textPanel.fill = GridBagConstraints.BOTH;
 		gbc_textPanel.gridx = 4;
 		gbc_textPanel.gridy = 0;
@@ -105,7 +119,6 @@ public class GamePanel extends JPanel{
 		choicesPanel = new JPanel();
 		choicesPanel.setBackground(Color.BLUE);
 		GridBagConstraints gbc_ChoicesPanel = new GridBagConstraints();
-		gbc_ChoicesPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_ChoicesPanel.gridheight = 5;
 		gbc_ChoicesPanel.gridwidth = 21;
 		gbc_ChoicesPanel.fill = GridBagConstraints.BOTH;
@@ -166,7 +179,7 @@ public class GamePanel extends JPanel{
 		leftButton.setVisible(false);
 		middleButton.setVisible(false);
 		rightButton.setVisible(false);
-		
+		repaint();
 		registerButtonListener();
 		repaint();
 		
@@ -199,9 +212,20 @@ public class GamePanel extends JPanel{
 	}
 	private void createGameStart() {
 		// TODO erstelle StartLayout für Panels
-		
+		setBackgroundImage(0);
 	}
 	private void doOnTick() {
+	
+		textPanel.revalidate();
+		leftBGPanel.revalidate();
+		rightBGPanel.revalidate();
+		choicesPanel.revalidate();
+		
+		textPanel.repaint();
+		leftBGPanel.repaint();
+		rightBGPanel.repaint();
+		choicesPanel.repaint();
+		
 		repaint();
 	}
 	public void startGame() {
@@ -224,7 +248,15 @@ public class GamePanel extends JPanel{
 		createGameStart();
 		startGame();
 	}
-	
+	public void setBackgroundImage(int imageNumber) {
+		
+		String imagePath = IMAGE_DIR + backgroundImages[imageNumber];
+		URL imageURL = getClass().getResource(imagePath);        
+		backgroundImage = new ImageIcon(imageURL);
+		leftBGPanel.setImage(backgroundImage.getImage());
+		rightBGPanel.setImage(backgroundImage.getImage());
+	}
+		
 	public void selectDifficulty() {
 
 		warten = true;
@@ -245,22 +277,19 @@ public class GamePanel extends JPanel{
 		leftButton.setVisible(true);
 		middleButton.setVisible(true);
 		rightButton.setVisible(true);
-		repaint();
-		//TODO Spieler Klasse erstellen
-		while(warten) {
-		}
-		switch(entscheidung) {
-		case "left":
-			player.setLife(5);
-			break;
-		case "middle":
-			player.setLife(3);
-			break;
-		case "right":
-			player.setLife(1);
-			break;
-		}
-		
+//		while(warten) {
+//		}
+//		switch(entscheidung) {
+//		case "left":
+//			player.setLife(5);
+//			break;
+//		case "middle":
+//			player.setLife(3);
+//			break;
+//		case "right":
+//			player.setLife(1);
+//			break;
+//		}
 	}
 	
 	private void registerButtonListener() {        
@@ -285,6 +314,5 @@ public class GamePanel extends JPanel{
 				warten = false;
 			}
 		});
-		
     }
 }
