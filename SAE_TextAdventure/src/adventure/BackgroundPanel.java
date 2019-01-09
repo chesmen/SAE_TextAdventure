@@ -27,6 +27,13 @@ public class BackgroundPanel extends JPanel
 	private boolean isTransparentAdd = true;
 
 	/*
+	 * If no parameters are given, just create an empty JPanel
+	 */
+	public BackgroundPanel() {
+		super();
+	}
+	
+	/*
 	 *  Set image as the background with the SCALED style
 	 */
 	public BackgroundPanel(Image image)

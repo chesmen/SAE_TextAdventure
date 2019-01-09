@@ -52,16 +52,16 @@ public class GamePanel extends JPanel{
 	String entscheidung;
 	
 
-	// = new ImageIcon(getClass().getResource(IMAGE_DIR + backgroundImages[0]));
+	// TODO adjust images
 	
 	
 	public static final String IMAGE_DIR = "images/";
-	private final String[] backgroundImages= new String [] {"waldrand.jpg" // 0
-														   ,"seetal.jpg","wurzelzwerge.jpg" // 1 , 2
-														   ,"fluss.jpg","wald.jpg","windheim.jpg" // 3 , 4 , 5
-														   ,"steinheim.jpg","felstal.jpg" // 6 , 7
-														   ,"spitzberg.jpg"}; // 8
-	private ImageIcon backgroundImage = new ImageIcon(getClass().getResource(IMAGE_DIR + backgroundImages[0]));
+	private final String[] backgroundImages= new String [] {"waldrand" // 0
+														   ,"seetal","wurzelzwerge" // 1 , 2
+														   ,"fluss","wald","windheim" // 3 , 4 , 5
+														   ,"steinheim","felstal" // 6 , 7
+														   ,"spitzberg"}; // 8
+	private ImageIcon backgroundImage;//= new ImageIcon(getClass().getResource(IMAGE_DIR + backgroundImages[0]));
 	
 	
 	Player player;
@@ -85,7 +85,7 @@ public class GamePanel extends JPanel{
 		gbl_MainPanel.rowWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gbl_MainPanel);
         
-        leftBGPanel = new BackgroundPanel(backgroundImage.getImage());
+        leftBGPanel = new BackgroundPanel(/*backgroundImage.getImage()*/);
 		leftBGPanel.setBackground(Color.ORANGE);
 		GridBagConstraints gbc_LeftBGPanel = new GridBagConstraints();
 		gbc_LeftBGPanel.gridwidth = 4;
@@ -95,7 +95,7 @@ public class GamePanel extends JPanel{
 		gbc_LeftBGPanel.gridy = 0;
 		add(leftBGPanel, gbc_LeftBGPanel);
 		
-		rightBGPanel = new BackgroundPanel(backgroundImage.getImage());
+		rightBGPanel = new BackgroundPanel(/*backgroundImage.getImage()*/);
 		rightBGPanel.setBackground(Color.ORANGE);
 		GridBagConstraints gbc_RightBGPanel = new GridBagConstraints();
 		gbc_RightBGPanel.gridheight = 17;
@@ -249,13 +249,19 @@ public class GamePanel extends JPanel{
 		startGame();
 	}
 	public void setBackgroundImage(int imageNumber) {
-		
-		String imagePath = IMAGE_DIR + backgroundImages[imageNumber];
+		//Linkes Hintergrundbild
+		String imagePath = IMAGE_DIR + backgroundImages[imageNumber] + "_left.jpg";
 		URL imageURL = getClass().getResource(imagePath);        
 		backgroundImage = new ImageIcon(imageURL);
 		leftBGPanel.setImage(backgroundImage.getImage());
+		//rechtes Hintergrundbild
+		imagePath = IMAGE_DIR + backgroundImages[imageNumber] + "_right.jpg";
+		imageURL = getClass().getResource(imagePath);        
+		backgroundImage = new ImageIcon(imageURL);
 		rightBGPanel.setImage(backgroundImage.getImage());
 	}
+		
+	
 		
 	public void selectDifficulty() {
 
