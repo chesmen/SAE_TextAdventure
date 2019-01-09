@@ -15,7 +15,9 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 
 import static java.awt.event.KeyEvent.*;
 
@@ -272,9 +274,7 @@ public class GamePanel extends JPanel{
 			rightBGPanel.setImage(backgroundImage.getImage());
 		}
 	}
-		
-	
-		
+			
 	public void selectDifficulty() {
 
 		warten = true;
@@ -320,6 +320,19 @@ public class GamePanel extends JPanel{
 				nextStory();
 				break;
 		}
+	}
+	
+	private void getStory() {
+		String storyPath = STORY_DIR + counterStory + ".txt";
+		
+		FileReader in = new FileReader(storyPath);
+	    BufferedReader br = new BufferedReader(in);
+
+	    String line;
+	    while ((line = br.readLine()) != null) {
+	        System.out.println(line);
+	    }
+	    in.close();
 	}
 	
 	private void setALLOptionsVisible(boolean option) {
