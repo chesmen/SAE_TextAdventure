@@ -73,7 +73,7 @@ public class GamePanel extends JPanel {
 	public static final String STORY_DIR = "story/";  //FIXME set style of text via <html></html>
 	private final int[] storyChapters= new int [] {3,2,2,3,6,1,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
 													//TODO finish story create and update steps, !!current numbers just a test!!
-	
+	private int storyStep; // current Story Step
 	Player player;
 	
 	private JButton leftButton = new JButton("");
@@ -193,20 +193,25 @@ public class GamePanel extends JPanel {
 	public boolean isGameOver() {
 		return gameOver;
 	}
-
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
+	}
+	public int getStoryStep() {
+		return storyStep;
+	}
+	public void setStoryStep(int storyStep) {
+		this.storyStep = storyStep;
 	}
 	public void checkGameOver() {
 		if(player.life<1) {
 			gameOver = true;
 		}
 	}
-
 	private void initGame () {
 		gameOver = false;
 		counterBackground = 0;
 		counterStory = -1; // mambo jambo Code, storyCounter gets increased then used..... //FIXME IF workaround found check all instances
+		setStoryStep(1);
 		timer = new Timer(20, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -246,11 +251,9 @@ public class GamePanel extends JPanel {
 		timer.start();
 		selectDifficulty();
 	}
-	
 	public void pauseGame() {
 		timer.stop();
 	}
-	
 	public void continueGame() {
 		if (!isGameOver()) {
 			timer.start();
@@ -258,10 +261,7 @@ public class GamePanel extends JPanel {
 	}
 	public void restartGame() {
 		setALLOptionsVisible(false);
-		counterBackground = 0;
-		counterStory = -1;
-		setGameOver(false);
-		createGameStart();
+		initGame();
 		startGame();
 	}
 	public void setBackgroundImage(int imageNumber) {
@@ -279,7 +279,6 @@ public class GamePanel extends JPanel {
 			rightBGPanel.setImage(backgroundImage.getImage());
 		}
 	}
-			
 	public void selectDifficulty() {
 
 		warten = true;
@@ -300,18 +299,22 @@ public class GamePanel extends JPanel {
 		
 		setALLOptionsVisible(true);
 	}
-	
 	public void nextStory() {
 		counterStory++;
 		runStory();
 	}
-	
 	public void runStory() {
 		String story = getStory();
 		label_Text.setText(story);
+		middleButton.setText("Weiter");
+		if(storyStep<=storyChapters[counterStory]) {
+			middleButton.setActionCommand("Kapitel"); // next Step in Chapter
+		} else {
+			middleButton.setActionCommand("Spiel"); // next Minigame
+		}
 		label_Text.setVisible(true);
+		middleButton.setVisible(true);
 	}
-	
 	public void doChoice() {
 		switch(choice) {
 			case "Einfach":
@@ -326,6 +329,8 @@ public class GamePanel extends JPanel {
 				player.setLife(1);
 				nextStory();
 				break;
+			//TODO create Choice Kapitel and Spiel
+			//TODO create default with a printout of most variables for Troubleshooting
 		}
 	}
 	private String getStory() {
@@ -351,7 +356,6 @@ public class GamePanel extends JPanel {
 		}
 		return "<html><font color='white'>"+chapter+"</font>";
 	}
-	
 	private void setALLOptionsVisible(boolean option) {
 		
 		label_Text.setVisible(option);
@@ -363,7 +367,6 @@ public class GamePanel extends JPanel {
 		middleButton.setVisible(option);
 		rightButton.setVisible(option);
 	}
-	
 	private void registerButtonListener() {        
         leftButton.addActionListener(new ActionListener() {
 			@Override
