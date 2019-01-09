@@ -45,24 +45,25 @@ public class GamePanel extends JPanel{
 	private final JPanel choicesPanel;
 	
 	private Timer timer;
-	private boolean gameOver = false;
-	private int counter = 0;
+	private boolean gameOver;
+	private int counterBackground;
+	private int counterStory; // mambo jambo Code, storyCounter gets increased then used..... //FIXME IF workaround found check all instances
 	private Color bgColor;
 	boolean warten;
-	String entscheidung;
-	
-
-	// TODO adjust images
-	
+	String choice;
 	
 	public static final String IMAGE_DIR = "images/"; 
-	private final String[] backgroundImages= new String [] {"waldrand" // 0
-														   ,"seetal","wurzelzwerge" // 1 , 2
-														   ,"fluss","wald","windheim" // 3 , 4 , 5
-														   ,"steinheim","felstal" // 6 , 7
-														   ,"spitzberg"}; // 8
-	private ImageIcon backgroundImage;//= new ImageIcon(getClass().getResource(IMAGE_DIR + backgroundImages[0]));
+	private final String[] backgroundImages= new String []  {"home" //
+															,"waldrand" //
+															,"seetal","wurzelzwerge" // 
+															,"fluss","wald","windheim" // 
+															,"steinheim","felstal" // 
+															,"spitzberg"}; // 
+	private ImageIcon backgroundImage;
 	
+	public static final String STORY_DIR = "story/";
+	private final int[] storyChapters= new int [] {3,2,2,3,6,1,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter
+													//TODO finisch story create and update steps, !!current numbers just a test!!
 	
 	Player player;
 	
@@ -165,20 +166,10 @@ public class GamePanel extends JPanel{
 						.addComponent(rightButton))
 					.addGap(60))
 		);
-		choicesPanel.setLayout(gl_choicesPanel);
+		choicesPanel.setLayout(gl_choicesPanel);		
 		
+		setALLOptionsVisible(false);
 		
-		
-		label_choice1.setVisible(false);
-		label_choice2.setVisible(false);
-		
-		leftButton.setActionCommand("left");
-		middleButton.setActionCommand("middle");
-		rightButton.setActionCommand("right");		
-		
-		leftButton.setVisible(false);
-		middleButton.setVisible(false);
-		rightButton.setVisible(false);
 		repaint();
 		registerButtonListener();
 		repaint();
@@ -201,6 +192,9 @@ public class GamePanel extends JPanel{
 	}
 
 	private void initGame () {
+		gameOver = false;
+		counterBackground = 0;
+		counterStory = -1; // mambo jambo Code, storyCounter gets increased then used..... //FIXME IF workaround found check all instances
 		timer = new Timer(20, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -212,7 +206,7 @@ public class GamePanel extends JPanel{
 	}
 	private void createGameStart() {
 		// TODO erstelle StartLayout für Panels
-		setBackgroundImage(counter);
+		setBackgroundImage(counterBackground);
 	}
 	private void doOnTick() {
 	
@@ -243,7 +237,9 @@ public class GamePanel extends JPanel{
 		}
 	}
 	public void restartGame() {
-		counter = 0;
+		setALLOptionsVisible(false);
+		counterBackground = 0;
+		counterStory = -1;
 		setGameOver(false);
 		createGameStart();
 		startGame();
@@ -281,50 +277,70 @@ public class GamePanel extends JPanel{
 		middleButton.setText("Mittel");
 		rightButton.setText("Schwer");
 		
-		label_choice1.setVisible(true);
-		label_choice2.setVisible(true);
-		leftButton.setVisible(true);
-		middleButton.setVisible(true);
-		rightButton.setVisible(true);
-		//FIXME jump to story start after setting Lifecount
-//		while(warten) {
-//		}
-//		switch(entscheidung) {
-//		case "left":
-//			player.setLife(5);
-//			break;
-//		case "middle":
-//			player.setLife(3);
-//			break;
-//		case "right":
-//			player.setLife(1);
-//			break;
-//		}
+		leftButton.setActionCommand("Einfach");
+		middleButton.setActionCommand("Mittel");
+		rightButton.setActionCommand("Schwer");
+		
+		setALLOptionsVisible(true);
+	}
+	
+	public void nextStory() {
+		counterStory++;
+		runStory();
+	}
+	
+	public void runStory() {
+		
+	}
+	
+	public void doChoice() {
+		switch(choice) {
+			case "Einfach":
+				player.setLife(5);
+				nextStory();
+				break;
+			case "Mittel":
+				player.setLife(3);
+				nextStory();
+				break;
+			case "Schwer":
+				player.setLife(1);
+				nextStory();
+				break;
+		}
+	}
+	
+	private void setALLOptionsVisible(boolean option) {
+		label_choice1.setVisible(option);
+		label_choice2.setVisible(option);
+		leftButton.setVisible(option);
+		middleButton.setVisible(option);
+		rightButton.setVisible(option);
 	}
 	
 	private void registerButtonListener() {        
         leftButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				//TODO FIXME  counter++ and setBGI just a test
-				counter++;
-				setBackgroundImage(counter);
-				entscheidung = leftButton.getActionCommand();
-				warten = false;
+				choice = leftButton.getActionCommand();
+				setALLOptionsVisible(false);
+				doChoice();
 			}
 		});
 		middleButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent mb) {
-				entscheidung = middleButton.getActionCommand();
-				warten = false;
+				choice = middleButton.getActionCommand();
+				setALLOptionsVisible(false);
+				doChoice();
 			}
 		});
 		rightButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent rb) {
-				entscheidung = rightButton.getActionCommand();
-				warten = false;
+				choice = rightButton.getActionCommand();
+				setALLOptionsVisible(false);
+				doChoice();
 			}
 		});
     }

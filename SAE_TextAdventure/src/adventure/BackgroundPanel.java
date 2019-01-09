@@ -4,6 +4,10 @@ import java.awt.*;
 import java.awt.image.*;
 import javax.swing.*;
 
+//TODO maybe rewrite it to my needs
+// got this code from https://tips4java.wordpress.com/2008/10/12/background-panel/
+
+
 /*
  *  Support custom painting on a panel in the form of
  *
