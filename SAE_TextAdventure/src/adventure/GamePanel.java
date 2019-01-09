@@ -18,6 +18,8 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 
 import static java.awt.event.KeyEvent.*;
+
+import java.awt.BorderLayout;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -61,15 +63,17 @@ public class GamePanel extends JPanel{
 															,"spitzberg"}; // 
 	private ImageIcon backgroundImage;
 	
-	public static final String STORY_DIR = "story/";
-	private final int[] storyChapters= new int [] {3,2,2,3,6,1,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter
-													//TODO finisch story create and update steps, !!current numbers just a test!!
+	public static final String STORY_DIR = "story/";  //FIXME set style of text via <html></html>
+	private final int[] storyChapters= new int [] {3,2,2,3,6,1,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
+													//TODO finish story create and update steps, !!current numbers just a test!!
 	
 	Player player;
 	
 	private JButton leftButton = new JButton("");
 	private JButton middleButton = new JButton("");	
 	private JButton rightButton = new JButton("");
+	
+	JLabel label_Text;
 	
 	JLabel label_choice1 = new JLabel("");
 	JLabel label_choice2 = new JLabel("");
@@ -108,12 +112,15 @@ public class GamePanel extends JPanel{
 		
 		textPanel = new JPanel();
 		textPanel.setBackground(Color.RED);
+		textPanel.setLayout(new BorderLayout());
 		GridBagConstraints gbc_textPanel = new GridBagConstraints();
 		gbc_textPanel.gridwidth = 21;
 		gbc_textPanel.gridheight = 12;
 		gbc_textPanel.fill = GridBagConstraints.BOTH;
 		gbc_textPanel.gridx = 4;
 		gbc_textPanel.gridy = 0;
+		label_Text = new JLabel();
+		textPanel.add(label_Text, BorderLayout.CENTER);
 		add(textPanel, gbc_textPanel);
 		
 				
@@ -170,10 +177,8 @@ public class GamePanel extends JPanel{
 		
 		setALLOptionsVisible(false);
 		
-		repaint();
 		registerButtonListener();
-		repaint();
-		
+				
         initGame();         
         startGame();
     }
@@ -205,7 +210,15 @@ public class GamePanel extends JPanel{
 		createGameStart();
 	}
 	private void createGameStart() {
-		// TODO erstelle StartLayout für Panels
+		textPanel.setBackground(Color.BLACK);
+		//TODO create Gameinfo at Start
+		label_Text.setText("GAME START");
+		//FIXME set style of text via <html></html>
+		label_Text.setForeground(Color.WHITE);
+		label_Text.setHorizontalAlignment(SwingConstants.CENTER);
+		label_Text.setVerticalAlignment(SwingConstants.CENTER);
+		
+		choicesPanel.setBackground(Color.DARK_GRAY);
 		setBackgroundImage(counterBackground);
 	}
 	private void doOnTick() {
@@ -266,7 +279,6 @@ public class GamePanel extends JPanel{
 
 		warten = true;
 		
-		choicesPanel.setBackground(Color.DARK_GRAY);
 		label_choice1.setForeground(Color.WHITE);
 		label_choice2.setForeground(Color.WHITE);
 		
@@ -311,8 +323,12 @@ public class GamePanel extends JPanel{
 	}
 	
 	private void setALLOptionsVisible(boolean option) {
+		
+		label_Text.setVisible(option);
+		
 		label_choice1.setVisible(option);
 		label_choice2.setVisible(option);
+		
 		leftButton.setVisible(option);
 		middleButton.setVisible(option);
 		rightButton.setVisible(option);
