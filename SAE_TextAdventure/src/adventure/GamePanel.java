@@ -17,8 +17,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
-
+import java.io.IOException;
+import javax.swing.text.html.StyleSheet;
 import static java.awt.event.KeyEvent.*;
 
 import java.awt.BorderLayout;
@@ -41,7 +43,7 @@ import javax.swing.Timer;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-public class GamePanel extends JPanel{
+public class GamePanel extends JPanel {
 
 	private final JPanel textPanel;
 	private final BackgroundPanel leftBGPanel;
@@ -65,7 +67,7 @@ public class GamePanel extends JPanel{
 															,"spitzberg"}; // 
 	private ImageIcon backgroundImage;
 	
-	public static final String STORY_DIR = "story/";  //FIXME set style of text via <html></html>
+	public static final String STORY_DIR = "/story/";  //FIXME set style of text via <html></html>
 	private final int[] storyChapters= new int [] {3,2,2,3,6,1,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
 													//TODO finish story create and update steps, !!current numbers just a test!!
 	
@@ -214,9 +216,9 @@ public class GamePanel extends JPanel{
 	private void createGameStart() {
 		textPanel.setBackground(Color.BLACK);
 		//TODO create Gameinfo at Start
-		label_Text.setText("GAME START");
+		label_Text.setText("<html><font color='white'>GAME START!</font>");
 		//FIXME set style of text via <html></html>
-		label_Text.setForeground(Color.WHITE);
+		//label_Text.setForeground(Color.WHITE);
 		label_Text.setHorizontalAlignment(SwingConstants.CENTER);
 		label_Text.setVerticalAlignment(SwingConstants.CENTER);
 		
@@ -302,7 +304,9 @@ public class GamePanel extends JPanel{
 	}
 	
 	public void runStory() {
-		
+		String story = getStory();
+		label_Text.setText(story);
+		label_Text.setVisible(true);
 	}
 	
 	public void doChoice() {
@@ -321,18 +325,33 @@ public class GamePanel extends JPanel{
 				break;
 		}
 	}
-	
-	private void getStory() {
+	//FIXME get the File in the FileREADER
+	private String getStory() {
 		String storyPath = STORY_DIR + counterStory + ".txt";
+		URL storyURL = getClass().getResource(storyPath);
 		
-		FileReader in = new FileReader(storyPath);
-	    BufferedReader br = new BufferedReader(in);
+		
+		File storyFile = new File(storyURL.getPath());
+		
+		FileReader in;
+		BufferedReader br;
+		String line = "";
+		String chapter = "";
+		try {
+			in = new FileReader(storyPath); //storyPath
+			br = new BufferedReader(in);
 
-	    String line;
-	    while ((line = br.readLine()) != null) {
-	        System.out.println(line);
-	    }
-	    in.close();
+		    
+		    while ((line = br.readLine()) != null) {
+		    	chapter += line+"<br>";	        
+		    }
+		    br.close();
+		    in.close();
+		} catch (IOException e) {
+			chapter = "ERROR: FILE NOT FOUND! Can't display text";
+			e.printStackTrace();
+		}
+		return "<html><font color='white'>"+chapter+"</font>";
 	}
 	
 	private void setALLOptionsVisible(boolean option) {
