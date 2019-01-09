@@ -46,7 +46,7 @@ public class GamePanel extends JPanel{
 	
 	private Timer timer;
 	private boolean gameOver = false;
-	private int counter;
+	private int counter = 0;
 	private Color bgColor;
 	boolean warten;
 	String entscheidung;
@@ -55,7 +55,7 @@ public class GamePanel extends JPanel{
 	// TODO adjust images
 	
 	
-	public static final String IMAGE_DIR = "images/";
+	public static final String IMAGE_DIR = "images/"; 
 	private final String[] backgroundImages= new String [] {"waldrand" // 0
 														   ,"seetal","wurzelzwerge" // 1 , 2
 														   ,"fluss","wald","windheim" // 3 , 4 , 5
@@ -85,7 +85,7 @@ public class GamePanel extends JPanel{
 		gbl_MainPanel.rowWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gbl_MainPanel);
         
-        leftBGPanel = new BackgroundPanel(/*backgroundImage.getImage()*/);
+        leftBGPanel = new BackgroundPanel();
 		leftBGPanel.setBackground(Color.ORANGE);
 		GridBagConstraints gbc_LeftBGPanel = new GridBagConstraints();
 		gbc_LeftBGPanel.gridwidth = 4;
@@ -95,7 +95,7 @@ public class GamePanel extends JPanel{
 		gbc_LeftBGPanel.gridy = 0;
 		add(leftBGPanel, gbc_LeftBGPanel);
 		
-		rightBGPanel = new BackgroundPanel(/*backgroundImage.getImage()*/);
+		rightBGPanel = new BackgroundPanel();
 		rightBGPanel.setBackground(Color.ORANGE);
 		GridBagConstraints gbc_RightBGPanel = new GridBagConstraints();
 		gbc_RightBGPanel.gridheight = 17;
@@ -212,7 +212,7 @@ public class GamePanel extends JPanel{
 	}
 	private void createGameStart() {
 		// TODO erstelle StartLayout für Panels
-		setBackgroundImage(0);
+		setBackgroundImage(counter);
 	}
 	private void doOnTick() {
 	
@@ -249,16 +249,19 @@ public class GamePanel extends JPanel{
 		startGame();
 	}
 	public void setBackgroundImage(int imageNumber) {
-		//Linkes Hintergrundbild
-		String imagePath = IMAGE_DIR + backgroundImages[imageNumber] + "_left.jpg";
-		URL imageURL = getClass().getResource(imagePath);        
-		backgroundImage = new ImageIcon(imageURL);
-		leftBGPanel.setImage(backgroundImage.getImage());
-		//rechtes Hintergrundbild
-		imagePath = IMAGE_DIR + backgroundImages[imageNumber] + "_right.jpg";
-		imageURL = getClass().getResource(imagePath);        
-		backgroundImage = new ImageIcon(imageURL);
-		rightBGPanel.setImage(backgroundImage.getImage());
+		// prevent OutOfBounds
+		if(imageNumber>=0 && imageNumber<backgroundImages.length) {
+			//Linkes Hintergrundbild
+			String imagePath = IMAGE_DIR + backgroundImages[imageNumber] + "_left.jpg";
+			URL imageURL = getClass().getResource(imagePath);        
+			backgroundImage = new ImageIcon(imageURL);
+			leftBGPanel.setImage(backgroundImage.getImage());
+			//rechtes Hintergrundbild
+			imagePath = IMAGE_DIR + backgroundImages[imageNumber] + "_right.jpg";
+			imageURL = getClass().getResource(imagePath);        
+			backgroundImage = new ImageIcon(imageURL);
+			rightBGPanel.setImage(backgroundImage.getImage());
+		}
 	}
 		
 	
@@ -283,6 +286,7 @@ public class GamePanel extends JPanel{
 		leftButton.setVisible(true);
 		middleButton.setVisible(true);
 		rightButton.setVisible(true);
+		//FIXME jump to story start after setting Lifecount
 //		while(warten) {
 //		}
 //		switch(entscheidung) {
@@ -302,6 +306,9 @@ public class GamePanel extends JPanel{
         leftButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				//TODO FIXME  counter++ and setBGI just a test
+				counter++;
+				setBackgroundImage(counter);
 				entscheidung = leftButton.getActionCommand();
 				warten = false;
 			}
