@@ -20,10 +20,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+
 import javax.swing.text.html.StyleSheet;
 import static java.awt.event.KeyEvent.*;
 
 import java.awt.BorderLayout;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -67,7 +70,7 @@ public class GamePanel extends JPanel {
 															,"spitzberg"}; // 
 	private ImageIcon backgroundImage;
 	
-	public static final String STORY_DIR = "/story/";  //FIXME set style of text via <html></html>
+	public static final String STORY_DIR = "story/";  //FIXME set style of text via <html></html>
 	private final int[] storyChapters= new int [] {3,2,2,3,6,1,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
 													//TODO finish story create and update steps, !!current numbers just a test!!
 	
@@ -325,23 +328,18 @@ public class GamePanel extends JPanel {
 				break;
 		}
 	}
-	//FIXME get the File in the FileREADER
 	private String getStory() {
-		String storyPath = STORY_DIR + counterStory + ".txt";
-		URL storyURL = getClass().getResource(storyPath);
-		
-		
-		File storyFile = new File(storyURL.getPath());
-		
+		String storyPath = STORY_DIR + counterStory + ".txt"; // relative File-Path
+				
 		FileReader in;
 		BufferedReader br;
 		String line = "";
 		String chapter = "";
+		
 		try {
-			in = new FileReader(storyPath); //storyPath
+			in = new FileReader(this.getClass().getResource(storyPath).getPath()); // gets the absolute Path from the relative Path
 			br = new BufferedReader(in);
-
-		    
+			
 		    while ((line = br.readLine()) != null) {
 		    	chapter += line+"<br>";	        
 		    }
