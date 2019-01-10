@@ -13,38 +13,80 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.swing.text.html.StyleSheet;
 import static java.awt.event.KeyEvent.*;
+
+import java.awt.BorderLayout;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.imageio.ImageIO;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.Timer;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
-public class GamePanel extends JPanel{
+public class GamePanel extends JPanel {
 
 	private final JPanel textPanel;
-	private final JPanel leftBGPanel;
-	private final JPanel rightBGPanel;
+	private final BackgroundPanel leftBGPanel;
+	private final BackgroundPanel rightBGPanel;
 	private final JPanel choicesPanel;
 	
-	private final ButtonGroup buttonGroupSchwierigkeit = new ButtonGroup();
-	
 	private Timer timer;
-	private boolean gameOver = false;
-	private int counter;
-	private Color bgColor;
+	private boolean gameOver;
+	private int counterBackground;
+	private int counterStory; 
+	String choice;
+	
+	public static final String IMAGE_DIR = "images/"; 
+	private final String[] backgroundImages= new String []  {"home" //
+															,"waldrand" //
+															,"seetal","wurzelzwerge" // 
+															,"fluss","wald","windheim" // 
+															,"steinheim","felstal" // 
+															,"spitzberg"}; // 
+	private ImageIcon backgroundImage;
+	
+	public static final String STORY_DIR = "story/";  
+	private final int[] storyChapters= new int [] {4,5,3,4,4,5,4,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
+													//TODO finish story create and update steps, !!current numbers just a test!! DONE BY TEAMMEMBER
+	private int storyStep; // current Story Step
+	Player player;
+	
+	private JButton leftButton = new JButton("");
+	private JButton middleButton = new JButton("");	
+	private JButton rightButton = new JButton("");
+	
+	JLabel label_Text;
+	
+	JLabel label_choice1 = new JLabel("");
+	JLabel label_choice2 = new JLabel("");
 	
 	public GamePanel() {        
         setFocusable(true);
-        
+        setBackground(Color.GREEN);
+                
         GridBagLayout gbl_MainPanel = new GridBagLayout();
 										
 		gbl_MainPanel.columnWidths = new int[]{40, 40, 40, 40, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 40, 40, 40, 40, 0};
@@ -53,18 +95,17 @@ public class GamePanel extends JPanel{
 		gbl_MainPanel.rowWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gbl_MainPanel);
         
-        leftBGPanel = new JPanel();
+        leftBGPanel = new BackgroundPanel();
 		leftBGPanel.setBackground(Color.ORANGE);
 		GridBagConstraints gbc_LeftBGPanel = new GridBagConstraints();
 		gbc_LeftBGPanel.gridwidth = 4;
 		gbc_LeftBGPanel.gridheight = 17;
-		gbc_LeftBGPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_LeftBGPanel.fill = GridBagConstraints.BOTH;
 		gbc_LeftBGPanel.gridx = 0;
 		gbc_LeftBGPanel.gridy = 0;
 		add(leftBGPanel, gbc_LeftBGPanel);
 		
-		rightBGPanel = new JPanel();
+		rightBGPanel = new BackgroundPanel();
 		rightBGPanel.setBackground(Color.ORANGE);
 		GridBagConstraints gbc_RightBGPanel = new GridBagConstraints();
 		gbc_RightBGPanel.gridheight = 17;
@@ -76,20 +117,21 @@ public class GamePanel extends JPanel{
 		
 		textPanel = new JPanel();
 		textPanel.setBackground(Color.RED);
+		textPanel.setLayout(new BorderLayout());
 		GridBagConstraints gbc_textPanel = new GridBagConstraints();
 		gbc_textPanel.gridwidth = 21;
 		gbc_textPanel.gridheight = 12;
-		gbc_textPanel.insets = new Insets(0, 0, 5, 5);
 		gbc_textPanel.fill = GridBagConstraints.BOTH;
 		gbc_textPanel.gridx = 4;
 		gbc_textPanel.gridy = 0;
+		label_Text = new JLabel();
+		textPanel.add(label_Text, BorderLayout.CENTER);
 		add(textPanel, gbc_textPanel);
 		
 				
 		choicesPanel = new JPanel();
 		choicesPanel.setBackground(Color.BLUE);
 		GridBagConstraints gbc_ChoicesPanel = new GridBagConstraints();
-		gbc_ChoicesPanel.insets = new Insets(0, 0, 0, 5);
 		gbc_ChoicesPanel.gridheight = 5;
 		gbc_ChoicesPanel.gridwidth = 21;
 		gbc_ChoicesPanel.fill = GridBagConstraints.BOTH;
@@ -97,6 +139,51 @@ public class GamePanel extends JPanel{
 		gbc_ChoicesPanel.gridy = 12;
 		add(choicesPanel, gbc_ChoicesPanel);
         
+		label_choice1.setHorizontalAlignment(SwingConstants.CENTER);
+		label_choice1.setVerticalAlignment(SwingConstants.CENTER);
+		
+		label_choice2.setHorizontalAlignment(SwingConstants.CENTER);
+		label_choice2.setVerticalAlignment(SwingConstants.CENTER);
+		
+		GroupLayout gl_choicesPanel = new GroupLayout(choicesPanel);
+		gl_choicesPanel.setHorizontalGroup(
+			gl_choicesPanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_choicesPanel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(label_choice1, GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+					.addContainerGap())
+				.addGroup(gl_choicesPanel.createSequentialGroup()
+					.addGap(178)
+					.addComponent(leftButton, GroupLayout.DEFAULT_SIZE, 67, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(middleButton, GroupLayout.DEFAULT_SIZE, 59, Short.MAX_VALUE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(rightButton, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+					.addGap(218))
+				.addGroup(Alignment.TRAILING, gl_choicesPanel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(label_choice2, GroupLayout.DEFAULT_SIZE, 581, Short.MAX_VALUE)
+					.addContainerGap())
+		);
+		gl_choicesPanel.setVerticalGroup(
+			gl_choicesPanel.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_choicesPanel.createSequentialGroup()
+					.addComponent(label_choice1)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(label_choice2)
+					.addPreferredGap(ComponentPlacement.RELATED, 9, Short.MAX_VALUE)
+					.addGroup(gl_choicesPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(leftButton)
+						.addComponent(middleButton)
+						.addComponent(rightButton))
+					.addGap(60))
+		);
+		choicesPanel.setLayout(gl_choicesPanel);		
+		
+		setALLOptionsVisible(false);
+		
+		registerButtonListener();
+				
         initGame();         
         startGame();
     }
@@ -104,45 +191,226 @@ public class GamePanel extends JPanel{
 	public boolean isGameOver() {
 		return gameOver;
 	}
-
 	public void setGameOver(boolean gameOver) {
 		this.gameOver = gameOver;
 	}
-
+	public int getStoryStep() {
+		return storyStep;
+	}
+	public void setStoryStep(int storyStep) {
+		this.storyStep = storyStep;
+	}
+	public void checkGameOver() {
+		if(player.life<1) {
+			gameOver = true;
+		}
+	}
 	private void initGame () {
+		gameOver = false;
+		counterBackground = 0;
+		counterStory = 0; 
+		setStoryStep(1);
 		timer = new Timer(20, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 doOnTick();     
             }
         });
-		
+		player = new Player();
+		createGameStart();
 	}
-	private void createGameObjects() {
-		// TODO Auto-generated method stub
+	private void createGameStart() {
+		textPanel.setBackground(Color.BLACK);
+		//TODO create Gameinfo at Start
+		label_Text.setText("<html><font color='white'>GAME START!</font>");
+		//FIXME set style of text via <html></html>
+		//label_Text.setForeground(Color.WHITE);
+		label_Text.setHorizontalAlignment(SwingConstants.CENTER);
+		label_Text.setVerticalAlignment(SwingConstants.CENTER);
 		
+		choicesPanel.setBackground(Color.DARK_GRAY);
+		setBackgroundImage(counterBackground);
 	}
 	private void doOnTick() {
+	
+		textPanel.revalidate();
+		leftBGPanel.revalidate();
+		rightBGPanel.revalidate();
+		choicesPanel.revalidate();
 		
+		textPanel.repaint();
+		leftBGPanel.repaint();
+		rightBGPanel.repaint();
+		choicesPanel.repaint();
+		
+		repaint();
 	}
 	public void startGame() {
 		timer.start();
+		selectDifficulty();
 	}
-	
 	public void pauseGame() {
 		timer.stop();
 	}
-	
 	public void continueGame() {
 		if (!isGameOver()) {
 			timer.start();
 		}
 	}
 	public void restartGame() {
-		counter = 0;
-		setGameOver(false);
-		createGameObjects();
+		setALLOptionsVisible(false);
+		initGame();
 		startGame();
 	}
+	public void setBackgroundImage(int imageNumber) {
+		// prevent OutOfBounds
+		if(imageNumber>=0 && imageNumber<backgroundImages.length) {
+			//Linkes Hintergrundbild
+			String imagePath = IMAGE_DIR + backgroundImages[imageNumber] + "_left.jpg";
+			URL imageURL = getClass().getResource(imagePath);        
+			backgroundImage = new ImageIcon(imageURL);
+			leftBGPanel.setImage(backgroundImage.getImage());
+			//rechtes Hintergrundbild
+			imagePath = IMAGE_DIR + backgroundImages[imageNumber] + "_right.jpg";
+			imageURL = getClass().getResource(imagePath);        
+			backgroundImage = new ImageIcon(imageURL);
+			rightBGPanel.setImage(backgroundImage.getImage());
+		}
+	}
+	public void selectDifficulty() {
 
+		label_choice1.setForeground(Color.WHITE);
+		label_choice2.setForeground(Color.WHITE);
+		
+		label_choice1.setText("Wähle die Schwierigkeit!");
+		label_choice2.setText("Einfach: 5 Leben - Mittel: 3 Leben - Schwer: 1 Leben");
+		
+		leftButton.setText("Einfach");
+		middleButton.setText("Mittel");
+		rightButton.setText("Schwer");
+		
+		leftButton.setActionCommand("Einfach");
+		middleButton.setActionCommand("Mittel");
+		rightButton.setActionCommand("Schwer");
+		
+		setALLOptionsVisible(true);
+	}
+	public void nextStory() {
+		runStory();
+	}
+	public void runStory() {
+		String story = getStory();
+		label_Text.setText(story);
+		middleButton.setText("Weiter");
+		storyStep++;
+		if(storyStep<=storyChapters[counterStory]) {
+			middleButton.setActionCommand("Kapitel"); // next Step in Chapter
+		} else {
+			middleButton.setActionCommand("Spiel");// next Minigame
+		}
+		label_Text.setVisible(true);
+		middleButton.setVisible(true);
+	}
+	public void doChoice() {
+		switch(choice) {
+			case "Einfach":
+				player.setLife(5);
+				nextStory();
+				break;
+			case "Mittel":
+				player.setLife(3);
+				nextStory();
+				break;
+			case "Schwer":
+				player.setLife(1);
+				nextStory();
+				break;
+			case "Kapitel":
+				nextStory();
+				break;
+			case "Spiel":
+				counterStory++;
+				setStoryStep(1);
+				startRandomMinigame();
+				break;
+			default:
+				printERROR();			
+		}
+	}
+	private void startRandomMinigame() {
+		// TODO Auto-generated method stub
+		
+		//FIXME following line is a Test
+		setBackgroundImage((int)((backgroundImages.length-1)*Math.random()));
+		nextStory();
+	}
+
+	private String getStory() {
+		String storyPath = STORY_DIR + counterStory + "_" + storyStep + ".txt"; // relative File-Path
+				
+		FileReader in;
+		BufferedReader br;
+		String line = "";
+		String chapter = "";
+		
+		try {
+			in = new FileReader(this.getClass().getResource(storyPath).getPath()); // gets the absolute Path from the relative Path
+			br = new BufferedReader(in);
+			
+		    while ((line = br.readLine()) != null) {
+		    	chapter += line+"<br>";	        
+		    }
+		    br.close();
+		    in.close();
+		} catch (IOException e) {
+			chapter = "ERROR: FILE NOT FOUND! Can't display text<br><br>" + storyPath;
+			e.printStackTrace();
+		}
+		return "<html><font color='white'>"+chapter+"</font>";
+	}
+	private void setALLOptionsVisible(boolean option) {
+		
+		label_Text.setVisible(option);
+		
+		label_choice1.setVisible(option);
+		label_choice2.setVisible(option);
+		
+		leftButton.setVisible(option);
+		middleButton.setVisible(option);
+		rightButton.setVisible(option);
+	}
+	private void registerButtonListener() {        
+        leftButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				choice = leftButton.getActionCommand();
+				setALLOptionsVisible(false);
+				doChoice();
+			}
+		});
+		middleButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent mb) {
+				choice = middleButton.getActionCommand();
+				setALLOptionsVisible(false);
+				doChoice();
+			}
+		});
+		rightButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent rb) {
+				choice = rightButton.getActionCommand();
+				setALLOptionsVisible(false);
+				doChoice();
+			}
+		});
+    }
+	
+	public void printERROR() {
+		String string = label_Text.getText();
+		label_Text.setText("<html>GameOver: " + String.valueOf(gameOver) + " counterBackground: " + counterBackground + 
+							" counterStory: " + counterStory + " choice: " + choice + " storyStep: " + storyStep + "<br> Previous Text: " + string);
+		setALLOptionsVisible(true);
+	}
+	
 }
