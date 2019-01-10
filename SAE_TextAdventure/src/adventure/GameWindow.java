@@ -127,16 +127,14 @@ public class GameWindow extends JFrame {
 	}
 	
 	private void addItemsOptionenMenu(JMenu optionenMenu) {
-		// TODO Auto-generated method stub
-		JMenuItem changeBackgroundItem = new JMenuItem("Farben ändern..");
+		JMenuItem addLife = new JMenuItem("Leben hinzufügen");
 		
-		optionenMenu.add(changeBackgroundItem);
+		optionenMenu.add(addLife);
 		
-		changeBackgroundItem.addActionListener(new ActionListener() {
+		addLife.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO
-				//TODO
+				mainPanel.player.addLife(1);
 			}
 		});
 		

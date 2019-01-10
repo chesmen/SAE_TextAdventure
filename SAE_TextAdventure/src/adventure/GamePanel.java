@@ -223,8 +223,6 @@ public class GamePanel extends JPanel {
 		textPanel.setBackground(Color.BLACK);
 		//TODO create Gameinfo at Start
 		label_Text.setText("<html><font color='white'>GAME START!</font>");
-		//FIXME set style of text via <html></html>
-		//label_Text.setForeground(Color.WHITE);
 		label_Text.setHorizontalAlignment(SwingConstants.CENTER);
 		label_Text.setVerticalAlignment(SwingConstants.CENTER);
 		
@@ -303,10 +301,14 @@ public class GamePanel extends JPanel {
 		label_Text.setText(story);
 		middleButton.setText("Weiter");
 		storyStep++;
-		if(storyStep<=storyChapters[counterStory]) {
-			middleButton.setActionCommand("Kapitel"); // next Step in Chapter
-		} else {
-			middleButton.setActionCommand("Spiel");// next Minigame
+		if(counterStory<storyChapters.length-1) { 
+			if(storyStep<=storyChapters[counterStory]) {
+				middleButton.setActionCommand("Kapitel"); // next Step in Chapter
+			} else {
+				middleButton.setActionCommand("Spiel");// next Minigame
+			}
+		}else {
+			middleButton.setActionCommand("Ende");
 		}
 		label_Text.setVisible(true);
 		middleButton.setVisible(true);
@@ -333,13 +335,18 @@ public class GamePanel extends JPanel {
 				setStoryStep(1);
 				startRandomMinigame();
 				break;
+			case "Ende":
+				gameFinish();
+				break;
+			case "Restart":
+				restartGame();
+				break;
 			default:
 				printERROR();			
 		}
 	}
 	private void startRandomMinigame() {
-		// TODO Auto-generated method stub
-		
+	
 		//FIXME following line is a Test
 		setBackgroundImage((int)((backgroundImages.length-1)*Math.random()));
 		nextStory();
@@ -352,22 +359,40 @@ public class GamePanel extends JPanel {
 		BufferedReader br;
 		String line = "";
 		String chapter = "";
-		
 		try {
-			in = new FileReader(this.getClass().getResource(storyPath).getPath()); // gets the absolute Path from the relative Path
-			br = new BufferedReader(in);
-			
-		    while ((line = br.readLine()) != null) {
-		    	chapter += line+"<br>";	        
-		    }
-		    br.close();
-		    in.close();
-		} catch (IOException e) {
+			try {
+				in = new FileReader(this.getClass().getResource(storyPath).getPath()); // gets the absolute Path from the relative Path
+				br = new BufferedReader(in);
+				
+			    while ((line = br.readLine()) != null) {
+			    	chapter += line+"<br>";	        
+			    }
+			    br.close();
+			    in.close();
+			    return "<html><font color='white'>"+chapter+"</font>";
+			} catch (IOException e) {
+				chapter = "ERROR: FILE NOT FOUND! Can't display text<br><br>" + storyPath;
+				printERROR();
+				e.printStackTrace();
+			}
+		} catch (NullPointerException e) {
 			chapter = "ERROR: FILE NOT FOUND! Can't display text<br><br>" + storyPath;
+			printERROR();
 			e.printStackTrace();
 		}
 		return "<html><font color='white'>"+chapter+"</font>";
 	}
+	
+	private void gameFinish() {
+		label_Text.setText("<html><font color='white'>GAME Finish!</font>");
+		middleButton.setText("Restart?");
+		middleButton.setActionCommand("Restart");
+		label_Text.setVisible(true);
+		middleButton.setVisible(true);
+		//TODO add real Game Finish Message
+		
+	}
+	
 	private void setALLOptionsVisible(boolean option) {
 		
 		label_Text.setVisible(option);
@@ -408,8 +433,12 @@ public class GamePanel extends JPanel {
 	
 	public void printERROR() {
 		String string = label_Text.getText();
-		label_Text.setText("<html>GameOver: " + String.valueOf(gameOver) + " counterBackground: " + counterBackground + 
-							" counterStory: " + counterStory + " choice: " + choice + " storyStep: " + storyStep + "<br> Previous Text: " + string);
+		string = "<html>GameOver: " + String.valueOf(gameOver) + " counterBackground: " + counterBackground + 
+				" counterStory: " + counterStory + " storyStep: " + storyStep + " choice: " + choice + " leftbutton: " + leftButton.getActionCommand() 
+				+ " middlebutton: " + middleButton.getActionCommand()+ " rightbutton: " + rightButton.getActionCommand() 
+				+ "<br> Previous Text: " + string;
+		System.out.println(string);
+		label_Text.setText(string);
 		setALLOptionsVisible(true);
 	}
 	
