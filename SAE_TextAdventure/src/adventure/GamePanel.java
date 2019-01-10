@@ -56,9 +56,7 @@ public class GamePanel extends JPanel {
 	private Timer timer;
 	private boolean gameOver;
 	private int counterBackground;
-	private int counterStory; // mambo jambo Code, storyCounter gets increased then used..... //FIXME IF workaround found check all instances
-	private Color bgColor;
-	boolean warten;
+	private int counterStory; 
 	String choice;
 	
 	public static final String IMAGE_DIR = "images/"; 
@@ -70,9 +68,9 @@ public class GamePanel extends JPanel {
 															,"spitzberg"}; // 
 	private ImageIcon backgroundImage;
 	
-	public static final String STORY_DIR = "story/";  //FIXME set style of text via <html></html>
-	private final int[] storyChapters= new int [] {3,2,2,3,6,1,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
-													//TODO finish story create and update steps, !!current numbers just a test!!
+	public static final String STORY_DIR = "story/";  
+	private final int[] storyChapters= new int [] {4,5,3,4,4,5,4,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
+													//TODO finish story create and update steps, !!current numbers just a test!! DONE BY TEAMMEMBER
 	private int storyStep; // current Story Step
 	Player player;
 	
@@ -210,7 +208,7 @@ public class GamePanel extends JPanel {
 	private void initGame () {
 		gameOver = false;
 		counterBackground = 0;
-		counterStory = -1; // mambo jambo Code, storyCounter gets increased then used..... //FIXME IF workaround found check all instances
+		counterStory = 0; 
 		setStoryStep(1);
 		timer = new Timer(20, new ActionListener() {
             @Override
@@ -281,8 +279,6 @@ public class GamePanel extends JPanel {
 	}
 	public void selectDifficulty() {
 
-		warten = true;
-		
 		label_choice1.setForeground(Color.WHITE);
 		label_choice2.setForeground(Color.WHITE);
 		
@@ -300,17 +296,17 @@ public class GamePanel extends JPanel {
 		setALLOptionsVisible(true);
 	}
 	public void nextStory() {
-		counterStory++;
 		runStory();
 	}
 	public void runStory() {
 		String story = getStory();
 		label_Text.setText(story);
 		middleButton.setText("Weiter");
+		storyStep++;
 		if(storyStep<=storyChapters[counterStory]) {
 			middleButton.setActionCommand("Kapitel"); // next Step in Chapter
 		} else {
-			middleButton.setActionCommand("Spiel"); // next Minigame
+			middleButton.setActionCommand("Spiel");// next Minigame
 		}
 		label_Text.setVisible(true);
 		middleButton.setVisible(true);
@@ -329,12 +325,28 @@ public class GamePanel extends JPanel {
 				player.setLife(1);
 				nextStory();
 				break;
-			//TODO create Choice Kapitel and Spiel
-			//TODO create default with a printout of most variables for Troubleshooting
+			case "Kapitel":
+				nextStory();
+				break;
+			case "Spiel":
+				counterStory++;
+				setStoryStep(1);
+				startRandomMinigame();
+				break;
+			default:
+				printERROR();			
 		}
 	}
+	private void startRandomMinigame() {
+		// TODO Auto-generated method stub
+		
+		//FIXME following line is a Test
+		setBackgroundImage((int)((backgroundImages.length-1)*Math.random()));
+		nextStory();
+	}
+
 	private String getStory() {
-		String storyPath = STORY_DIR + counterStory + ".txt"; // relative File-Path
+		String storyPath = STORY_DIR + counterStory + "_" + storyStep + ".txt"; // relative File-Path
 				
 		FileReader in;
 		BufferedReader br;
@@ -351,7 +363,7 @@ public class GamePanel extends JPanel {
 		    br.close();
 		    in.close();
 		} catch (IOException e) {
-			chapter = "ERROR: FILE NOT FOUND! Can't display text";
+			chapter = "ERROR: FILE NOT FOUND! Can't display text<br><br>" + storyPath;
 			e.printStackTrace();
 		}
 		return "<html><font color='white'>"+chapter+"</font>";
@@ -393,4 +405,12 @@ public class GamePanel extends JPanel {
 			}
 		});
     }
+	
+	public void printERROR() {
+		String string = label_Text.getText();
+		label_Text.setText("<html>GameOver: " + String.valueOf(gameOver) + " counterBackground: " + counterBackground + 
+							" counterStory: " + counterStory + " choice: " + choice + " storyStep: " + storyStep + "<br> Previous Text: " + string);
+		setALLOptionsVisible(true);
+	}
+	
 }
