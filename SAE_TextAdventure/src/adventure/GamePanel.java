@@ -69,7 +69,8 @@ public class GamePanel extends JPanel {
 	private ImageIcon backgroundImage;
 	
 	public static final String STORY_DIR = "story/";  
-	private final int[] storyChapters= new int [] {4,5,3,4,4,5,4,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
+	private final int[] storyChapters= new int [] {7,5,3,4,4,5,4,3};	//Count of "Storysteps" (visible story in the textpanel) per chapter, Steps start at 1!!
+																		// Last Step is Decision TODO add decision input
 													//TODO finish story create and update steps, !!current numbers just a test!! DONE BY TEAMMEMBER
 	private int storyStep; // current Story Step
 	Player player;
