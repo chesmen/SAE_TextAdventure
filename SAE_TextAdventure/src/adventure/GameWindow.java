@@ -128,8 +128,9 @@ public class GameWindow extends JFrame {
 	
 	private void addItemsOptionenMenu(JMenu optionenMenu) {
 		JMenuItem addLife = new JMenuItem("Leben hinzufügen");
-		
+		JMenuItem gameInformation = new JMenuItem("Spielinformationen");
 		optionenMenu.add(addLife);
+		optionenMenu.add(gameInformation);
 		
 		addLife.addActionListener(new ActionListener() {
 			@Override
@@ -137,6 +138,11 @@ public class GameWindow extends JFrame {
 				mainPanel.player.addLife(1);
 			}
 		});
-		
+		gameInformation.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				mainPanel.gameInfo();
+			}
+		});
 	}
 }

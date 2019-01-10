@@ -29,6 +29,9 @@ public class Player {
 	public void setLevel(int level) {
 		this.level = level;
 	}
+	public void increaseLevel() {
+		this.level = this.level + 1 ;
+	}
 	public void addLife(int bonus) {
 		this.life += bonus;
 	}
