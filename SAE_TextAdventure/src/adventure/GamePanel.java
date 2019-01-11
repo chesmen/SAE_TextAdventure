@@ -336,6 +336,7 @@ public class GamePanel extends JPanel {
 	private void startRandomMinigame() {
 		player.increaseLevel();
 		//FIXME following line is a Test
+		
 		setBackgroundImage((int)((backgroundImages.length-1)*Math.random()));
 		nextStory();
 	}
@@ -383,10 +384,10 @@ public class GamePanel extends JPanel {
 	
 	private void gameFinish() {
 		label_Text.setText("<html><font color='white'>GAME Finish!</font>");
-		middleButton.setText("Restart?");
-		middleButton.setActionCommand("Restart");
+		rightButton.setText("Restart?");
+		rightButton.setActionCommand("Restart");
 		label_Text.setVisible(true);
-		middleButton.setVisible(true);
+		rightButton.setVisible(true);
 		//TODO add real Game Finish Message
 		
 	}
