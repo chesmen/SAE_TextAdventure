@@ -31,7 +31,7 @@ public class StorageManager {
 		 return result;
 	} // end of query Function!
 	
-	public int update(String query) throws SQLException
+	public int update(String query) throws SQLException 
 	{
 		stmt = conn.createStatement();
 		int done = stmt.executeUpdate(query);
